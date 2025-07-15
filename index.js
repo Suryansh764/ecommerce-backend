@@ -3,15 +3,15 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 
-const { initializeDatabase } = require("../db/db.connect");
+const { initializeDatabase } = require("./db/db.connect");
 
-const Product = require("../models/product.models");
-const Category = require("../models/category.models");
-const Address = require("../models/address.models");
-const Cart = require("../models/cart.models");
-const Order = require("../models/order.models");
-const Wishlist = require("../models/wishlist.models");
-const User = require("../models/user.models");
+const Product = require("./models/product.models");
+const Category = require("./models/category.models");
+const Address = require("./models/address.models");
+const Cart = require("./models/cart.models");
+const Order = require("./models/order.models");
+const Wishlist = require("./models/wishlist.models");
+const User = require("./models/user.models");
 
 
 const app = express();
