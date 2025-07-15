@@ -194,7 +194,7 @@ app.get("/api/users/:userId", async (req, res) => {
 //  Wishlist Routes
 
 
-// POST: Add to wishlist
+//  Add to wishlist
 app.post("/api/wishlist", async (req, res) => {
   try {
     const { userId, productId } = req.body;
@@ -222,7 +222,7 @@ app.post("/api/wishlist", async (req, res) => {
   }
 });
 
-// GET: Get wishlist for a user
+//  Get wishlist for a user
 app.get("/api/wishlist/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
@@ -239,7 +239,7 @@ app.get("/api/wishlist/:userId", async (req, res) => {
   }
 });
 
-// POST: Remove product from wishlist
+//  Remove product from wishlist
 app.post("/api/wishlist/remove", async (req, res) => {
   try {
     const { userId, productId } = req.body;
