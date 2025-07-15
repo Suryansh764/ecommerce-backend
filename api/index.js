@@ -3,21 +3,21 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 
-const { initializeDatabase } = require("./db/db.connect");
+const { initializeDatabase } = require("../db/db.connect");
 
-const Product = require("./models/product.models");
-const Category = require("./models/category.models");
-const Address = require("./models/address.models");
-const Cart = require("./models/cart.models");
-const Order = require("./models/order.models");
-const Wishlist = require("./models/wishlist.models");
-const User = require("./models/user.models");
-
+const Product = require("../models/product.models");
+const Category = require("../models/category.models");
+const Address = require("../models/address.models");
+const Cart = require("../models/cart.models");
+const Order = require("../models/order.models");
+const Wishlist = require("../models/wishlist.models");
+const User = require("../models/user.models");
+const serverless = require("serverless-http");
 
 const app = express();
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "*",
   credentials: true,
 }));
 
@@ -341,6 +341,4 @@ app.post("/api/cart/remove", async (req, res) => {
 
 
 const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+module.exports = serverless(app);
