@@ -12,7 +12,7 @@ const Cart = require("../models/cart.models");
 const Order = require("../models/order.models");
 const Wishlist = require("../models/wishlist.models");
 const User = require("../models/user.models");
-const serverless = require("serverless-http");
+
 
 const app = express();
 app.use(express.json());
@@ -341,4 +341,6 @@ app.post("/api/cart/remove", async (req, res) => {
 
 
 const PORT = 3000;
-module.exports = serverless(app);
+app.listen(PORT, () => {
+    console.log(`Server is running on the port ${PORT}`)
+})
