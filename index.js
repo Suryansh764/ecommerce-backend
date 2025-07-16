@@ -138,8 +138,6 @@ app.get("/api/categories/:categoryId", async (req, res) => {
 
 
 // Address Routes
-
-
 app.post("/api/addresses", async (req, res) => {
   try {
     const addresses = req.body.addresses;
@@ -148,13 +146,35 @@ app.post("/api/addresses", async (req, res) => {
       return res.status(400).json({ message: "No address data provided" });
     }
 
-    const saved = await Address.insertMany(addresses);
-    res.status(201).json({ message: "Addresses saved", addresses: saved });
+    const savedAddresses = await Address.insertMany(addresses);
+
+    // Extract unique user IDs
+    const userIds = [...new Set(savedAddresses.map(addr => addr.user.toString()))];
+
+    // Update each user to include new address IDs
+    await Promise.all(
+      userIds.map(async (userId) => {
+        const newAddressIds = savedAddresses
+          .filter(addr => addr.user.toString() === userId)
+          .map(addr => addr._id);
+
+        await User.findByIdAndUpdate(
+          userId,
+          { $push: { addresses: { $each: newAddressIds } } },
+          { new: true }
+        );
+      })
+    );
+
+    res.status(201).json({ message: "Addresses saved and linked to user", addresses: savedAddresses });
   } catch (error) {
     console.error("Error inserting addresses:", error);
     res.status(500).json({ message: "Failed to save addresses", error: error.message });
   }
 });
+
+
+
 
 
 //  User Routes
