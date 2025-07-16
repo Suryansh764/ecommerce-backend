@@ -64,12 +64,19 @@ app.post("/api/products", async (req, res) => {
 
 app.get("/api/products", async (req, res) => {
   try {
-    const products = await Product.find().populate("category");
+    const { category } = req.query; // Get ?category=... from the URL
+
+    const filter = category ? { category } : {}; // If category param exists, filter by it
+
+    const products = await Product.find(filter).populate("category");
+
     res.json({ data: { products } });
   } catch (error) {
+    console.error("Error fetching products:", error);
     res.status(500).json({ message: "Failed to fetch products" });
   }
 });
+
 
 app.get("/api/products/:productId", async (req, res) => {
   try {
