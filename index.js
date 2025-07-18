@@ -365,6 +365,36 @@ app.post("/api/cart/remove", async (req, res) => {
   }
 });
 
+app.post("/api/orders", async (req, res) => {
+  try {
+    const { userId, items, totalAmount, shippingAddress, paymentMethod } = req.body;
+
+    if (!userId || !items || !totalAmount || !shippingAddress || !paymentMethod) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const newOrder = new Order({
+      user: userId,
+      items,
+      totalAmount,
+      shippingAddress,
+      paymentStatus: "Paid", // Optional: can use `paymentMethod` to derive status
+      deliveryStatus: "Processing",
+    });
+
+    const savedOrder = await newOrder.save();
+
+    // Optionally clear cart
+    await Cart.findOneAndUpdate({ user: userId }, { items: [] });
+
+    res.status(201).json({ message: "Order placed successfully", order: savedOrder });
+  } catch (error) {
+    console.error("Error placing order:", error);
+    res.status(500).json({ message: "Failed to place order", error: error.message });
+  }
+});
+
+
 
 
 const PORT = 3000;
