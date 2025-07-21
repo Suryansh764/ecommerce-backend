@@ -366,6 +366,72 @@ app.post("/api/cart/remove", async (req, res) => {
 });
 
 
+app.get("/api/orders/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const orders = await Order.find({ user: userId })
+      .populate("items.product")
+      .populate("shippingAddress")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ data: { orders } });
+  } catch (error) {
+    console.error("Failed to fetch orders:", {
+      error: error.message,
+      stack: error.stack,
+      userId: req.params.userId,
+    });
+    res.status(500).json({ message: "Failed to fetch orders", error: error.message });
+  }
+});
+
+app.post("/api/orders", async (req, res) => {
+  try {
+    const { user, shippingAddress, paymentMethod, items } = req.body;
+
+    if (!user || !shippingAddress || !items || items.length === 0) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Calculate totalAmount from items
+    let totalAmount = 0;
+    for (const item of items) {
+      const product = await Product.findById(item.product);
+      if (!product) {
+        return res.status(404).json({ message: `Product not found: ${item.product}` });
+      }
+      totalAmount += product.price * item.quantity;
+    }
+
+    const newOrder = new Order({
+      user,
+      items,
+      totalAmount,
+      shippingAddress,
+      paymentMethod: paymentMethod || "Paid",
+    });
+
+    const savedOrder = await newOrder.save();
+
+    // Clear cart after placing order
+    await Cart.findOneAndUpdate({ user }, { items: [] });
+
+    res.status(201).json({
+      message: "Order placed successfully",
+      order: savedOrder,
+    });
+  } catch (error) {
+    console.error("Failed to place order:", {
+      error: error.message,
+      stack: error.stack,
+      body: req.body,
+    });
+    res.status(500).json({ message: "Failed to place order", error: error.message });
+  }
+});
+
+
 
 
 const PORT = 3000;
