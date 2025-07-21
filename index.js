@@ -36,6 +36,7 @@ app.get("/", (req, res) => {
 
 
 // Product Routes
+console.log("Requested category:", req.query.category);
 
 
 app.post("/api/products", async (req, res) => {
@@ -62,20 +63,30 @@ app.post("/api/products", async (req, res) => {
   }
 });
 
+const mongoose = require("mongoose");
+const Product = require("./models/Product");
+
 app.get("/api/products", async (req, res) => {
   try {
-    const { category } = req.query; // Get ?category=... from the URL
+    const { category } = req.query;
 
-    const filter = category ? { category } : {}; // If category param exists, filter by it
+    const filter = {};
+    if (category && mongoose.Types.ObjectId.isValid(category)) {
+      filter.category = category;
+    } else if (category) {
+      // If category param is present but invalid, return empty array or 400
+      return res.status(400).json({ message: "Invalid category ID" });
+    }
 
     const products = await Product.find(filter).populate("category");
 
     res.json({ data: { products } });
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error("Error fetching products:", error.message, error.stack);
     res.status(500).json({ message: "Failed to fetch products" });
   }
 });
+
 
 
 app.get("/api/products/:productId", async (req, res) => {
