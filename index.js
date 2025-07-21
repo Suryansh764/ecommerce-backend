@@ -36,7 +36,7 @@ app.get("/", (req, res) => {
 
 
 // Product Routes
-console.log("Requested category:", req.query.category);
+
 
 
 app.post("/api/products", async (req, res) => {
@@ -63,8 +63,8 @@ app.post("/api/products", async (req, res) => {
   }
 });
 
-const mongoose = require("mongoose");
-const Product = require("./models/Product");
+
+
 
 app.get("/api/products", async (req, res) => {
   try {
