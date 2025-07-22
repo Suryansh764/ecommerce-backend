@@ -19,7 +19,7 @@ app.use(express.json());
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://ecommerce-frontend-jet-nine.vercel.app", // ✅ replace with your deployed frontend
+  "https://ecommerce-frontend-steel-two.vercel.app", 
 ];
 
 app.use(cors({
