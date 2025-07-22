@@ -185,6 +185,60 @@ app.post("/api/addresses", async (req, res) => {
 });
 
 
+// Update user's full address array
+app.put("/api/users/:userId/address", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { addresses } = req.body;
+
+    if (!Array.isArray(addresses)) {
+      return res.status(400).json({ message: "Addresses should be an array" });
+    }
+
+    // Clear old addresses from Address model (optional)
+    await Address.deleteMany({ user: userId });
+
+    // Create new address documents
+    const newAddresses = await Address.insertMany(
+      addresses.map((addr) => ({ ...addr, user: userId }))
+    );
+
+    // Update user's address list
+    await User.findByIdAndUpdate(userId, {
+      addresses: newAddresses.map((a) => a._id),
+    });
+
+    res.status(200).json({
+      message: "Addresses updated",
+      addresses: newAddresses,
+    });
+  } catch (error) {
+    console.error("Failed to update addresses:", error);
+    res.status(500).json({ message: "Error updating addresses", error: error.message });
+  }
+});
+
+
+app.delete("/api/users/:userId/address/:addressId", async (req, res) => {
+  try {
+    const { userId, addressId } = req.params;
+
+    // Remove address from Address collection
+    await Address.findByIdAndDelete(addressId);
+
+    // Pull address from user's address list
+    await User.findByIdAndUpdate(userId, {
+      $pull: { addresses: addressId },
+    });
+
+    res.status(200).json({ message: "Address deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting address:", error);
+    res.status(500).json({ message: "Failed to delete address", error: error.message });
+  }
+});
+
+
 
 
 
