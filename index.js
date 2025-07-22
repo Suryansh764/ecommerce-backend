@@ -16,10 +16,24 @@ const User = require("./models/user.models");
 
 const app = express();
 app.use(express.json());
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://ecommerce-frontend-jet-nine.vercel.app", // ✅ replace with your deployed frontend
+];
+
 app.use(cors({
-  origin: "*",
-  credentials: true,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
 }));
+
+
 
 
 initializeDatabase()
